@@ -1,0 +1,68 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@model MVC_Project.Models.ProfileViewModel
+
+@if (User.IsInRole("Admin"))
+{
+	<h2>Welcome Admin</h2>
+}
+@if (User.Identity.IsAuthenticated)
+{
+<h2> My Profile </h2>
+	<table class="table">
+		<tr>
+			<th>First Name</th>
+			<td>@Model.Customer.FirstName</td>
+		</tr>
+		<tr>
+			<th>Last Name</th>
+			<td>@Model.Customer.LastName</td>
+		</tr>
+		<tr>
+			<th>Email</th>
+			<td>@Model.Customer.Email</td>
+		</tr>
+		<tr>
+			<th>Phone Number</th>
+			<td>@Model.Customer.PhoneNumber</td>
+		</tr>
+	</table>
+	<a asp-action="Edit" asp-route-id="@Model.Customer.CustomerId">Edit Profile</a>
+	<br/>
+	<br/>
+
+<h3> My Bookings </h3>
+
+	@if (!Model.Bookings.Any())
+	{
+		<h4>You have no bookings</h4>
+	}
+	else
+	{
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Booking Id</th>
+				<th>Car</th>
+				<th>Rented on</th>
+				<th>Due Back</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var booking in Model.Bookings)
+			{
+				<tr>
+					<td>@booking.BookingId</td>
+					<td>@(booking.Car != null ? $"{booking.Car.Make} {booking.Car.Model}" : "Unknown")</td>
+					<td>@booking.StartDate.ToShortDateString()</td>
+					<td>@booking.EndDate.ToShortDateString()</td>
+					<td><a asp-controller="Bookings" asp-action="Delete" asp-route-id=@booking.BookingId>Delete</a></td>
+				</tr>
+			}
+		</tbody>
+	</table>
+	}
+}
+@{
+}
