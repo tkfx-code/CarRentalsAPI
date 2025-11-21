@@ -3,17 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVC_Project", "MVC_Project.csproj", "{4D0F5006-86F8-437F-AD2C-A3E167901458}"
-	ProjectSection(ProjectDependencies) = postProject
-		{899CA861-F379-464C-8F00-EAD692EEF1F4} = {899CA861-F379-464C-8F00-EAD692EEF1F4}
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVC_Project", "MVC_Project\MVC_Project.csproj", "{6285ABBF-AB71-B082-AB44-1D420629D433}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRentalAPI", "..\CarRentalAPI\CarRentalAPI.csproj", "{E4DC32E8-24E1-417D-9894-CD6C1428D125}"
-	ProjectSection(ProjectDependencies) = postProject
-		{899CA861-F379-464C-8F00-EAD692EEF1F4} = {899CA861-F379-464C-8F00-EAD692EEF1F4}
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRentalAPI", "CarRentalAPI\CarRentalAPI.csproj", "{D0D9DD0A-0451-CB68-011D-76D006EAA5C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRentalsClassLibrary", "..\CarRentalsClassLibrary\CarRentalsClassLibrary.csproj", "{899CA861-F379-464C-8F00-EAD692EEF1F4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRentalsClassLibrary", "CarRentalsClassLibrary\CarRentalsClassLibrary.csproj", "{6EEE4D89-6E87-6005-4538-3EE029E7A7E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,18 +15,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4D0F5006-86F8-437F-AD2C-A3E167901458}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4D0F5006-86F8-437F-AD2C-A3E167901458}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4D0F5006-86F8-437F-AD2C-A3E167901458}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4D0F5006-86F8-437F-AD2C-A3E167901458}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E4DC32E8-24E1-417D-9894-CD6C1428D125}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E4DC32E8-24E1-417D-9894-CD6C1428D125}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E4DC32E8-24E1-417D-9894-CD6C1428D125}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E4DC32E8-24E1-417D-9894-CD6C1428D125}.Release|Any CPU.Build.0 = Release|Any CPU
-		{899CA861-F379-464C-8F00-EAD692EEF1F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{899CA861-F379-464C-8F00-EAD692EEF1F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{899CA861-F379-464C-8F00-EAD692EEF1F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{899CA861-F379-464C-8F00-EAD692EEF1F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6285ABBF-AB71-B082-AB44-1D420629D433}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6285ABBF-AB71-B082-AB44-1D420629D433}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6285ABBF-AB71-B082-AB44-1D420629D433}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6285ABBF-AB71-B082-AB44-1D420629D433}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0D9DD0A-0451-CB68-011D-76D006EAA5C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0D9DD0A-0451-CB68-011D-76D006EAA5C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0D9DD0A-0451-CB68-011D-76D006EAA5C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0D9DD0A-0451-CB68-011D-76D006EAA5C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EEE4D89-6E87-6005-4538-3EE029E7A7E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EEE4D89-6E87-6005-4538-3EE029E7A7E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EEE4D89-6E87-6005-4538-3EE029E7A7E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EEE4D89-6E87-6005-4538-3EE029E7A7E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

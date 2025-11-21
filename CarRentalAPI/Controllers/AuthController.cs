@@ -1,0 +1,122 @@
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using CarRentalAPI.Data;
+using CarRentalAPI.Dto;
+using CarRentalAPI.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+
+namespace CarRentalAPI.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AuthController : ControllerBase
+    {
+        private readonly UserManager<APIUser> _userManager;
+        private readonly IConfiguration configuration;
+
+        public AuthController(UserManager<APIUser> userManager, IConfiguration configuration)
+        {
+            _userManager = userManager;
+            this.configuration = configuration;
+        }
+
+        [HttpPost]
+        [Route("register")]
+        public async Task<IActionResult> Register([FromBody] UserDto userDto)
+        {
+            try
+            {
+                var user = new APIUser
+                {
+                    UserName = userDto.Email,
+                    Email = userDto.Email,
+                    EmailConfirmed = true
+                };
+                var result = await _userManager.CreateAsync(user, userDto.Password);
+
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(error.Code, error.Description);
+                    }
+                    return BadRequest(ModelState);
+                }
+                await _userManager.AddToRoleAsync(user, "User");
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Problem($"Something went wrong in the {ex}", statusCode: 500);
+            }
+        }
+
+        //role in parameter is probably wrong same with next method, fix
+        [HttpPost]
+        [Route("login")]
+        public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginUserDto loginUserDto)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(loginUserDto.Email);
+                var passwordValid = await _userManager.CheckPasswordAsync(user, loginUserDto.Password);
+
+                if (user == null || passwordValid == false)
+                {
+                    return Unauthorized(loginUserDto);
+                }
+                //hard coded - remove
+                List<string> role = new List<string>();
+                role.Add("Admin"); //fetch user role
+                string jwttoken = await CreateToken(user, role);
+
+                var response = new AuthResponseDto
+                {
+                    TokenString = jwttoken,
+                    UserId = user.Id,
+                    Email = loginUserDto.Email
+                };
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return Problem($"Something went wrong in the {ex}", statusCode: 500);
+            }
+        }
+
+        //Fix Custom Claim types and User roles
+        private async Task<string> CreateToken(APIUser user, IList<string> role)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var roleClaims = roles.Select(roles => new Claim(ClaimTypes.Role, roles)).ToList();
+            var userClaims = await _userManager.GetClaimsAsync(user);
+
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+                //new Claim(CustomClaimTypes.Uid, user.Id)
+            }
+            .Union(roleClaims)
+            .Union(userClaims);
+
+            var token = new JwtSecurityToken(
+                issuer: configuration["JwtSettings:Issuer"],
+                audience: configuration["JwtSettings:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddHours(3),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+    }
+}
