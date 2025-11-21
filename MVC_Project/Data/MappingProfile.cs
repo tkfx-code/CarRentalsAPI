@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MVC_Project.Models;
+using MVC_Project.Services;
 
 namespace MVC_Project.Data
 {
@@ -7,9 +8,9 @@ namespace MVC_Project.Data
     {
         public MappingProfile()
         {
-            //CreateMap<CustomerViewModel, Customer>().ReverseMap();
-            //CreateMap<CarListing, CarListingViewModel>().ReverseMap();
-            //CreateMap<Booking, BookingViewModel>().ForMember(model=>model.Car,options=>options.MapFrom(booking=>booking.Car)).ReverseMap();
+            CreateMap<CustomerViewModel, CustomerDto>().ReverseMap();
+            CreateMap<CarListingDto, CarListingViewModel>().ReverseMap();
+            CreateMap<BookingDto, BookingViewModel>().ForMember(model => model.Car, options => options.MapFrom(booking => booking.Car)).ReverseMap();
         }
     }
 }

@@ -3,16 +3,17 @@ using Microsoft.AspNetCore.Http;
 using MVC_Project.Models;
 using MVC_Project.Services;
 using CarRentalsClassLibrary.Model;
+using AutoMapper;
 
 namespace MVC_Project
 {
     public class BookingClientService : BaseService, IBookingClientService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IClient _client;
+        private readonly IMapper _mapper;
 
-        public BookingClientService(IHttpContextAccessor httpContextAccessor, IClient client) : base (httpContextAccessor, client)
+        public BookingClientService(IHttpContextAccessor httpContextAccessor, IClient client, IMapper mapper) : base (httpContextAccessor, client)
         {
+            _mapper = mapper;
         }
 
 
@@ -20,9 +21,10 @@ namespace MVC_Project
         {
             CarryAccessToken();
 
+
             try
             {
-                await _client.BookingsAllAsync(model);
+                await _client.BookingsPOSTAsync(_mapper.Map<BookingDto>(model));
                 return true;
             }
             catch (Exception ex)

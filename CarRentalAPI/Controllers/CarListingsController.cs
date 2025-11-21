@@ -1,4 +1,6 @@
-﻿using CarRentalAPI.Data;
+﻿using AutoMapper;
+using CarRentalAPI.Data;
+using CarRentalAPI.Dto;
 using CarRentalAPI.Interfaces;
 using CarRentalsClassLibrary.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -14,29 +16,34 @@ namespace CarRentalAPI.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ICarListingRepo _repo;
+        private readonly IMapper _mapper;
 
-        public CarListingsController(ApplicationDbContext context, ICarListingRepo repo)
+        public CarListingsController(ApplicationDbContext context, ICarListingRepo repo, IMapper mapper)
         {
             _context = context;
             _repo = repo;
+            _mapper = mapper;
         }
 
 
         // GET: api/<CarListingController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CarListing>>> GetAllCarsAsync()
+        public async Task<ActionResult<IEnumerable<CarListingDto>>> GetAllCarsAsync()
         {
             if (_context.CarListings == null)
             {
                 return NotFound();
             }
-            return await _context.CarListings.ToListAsync();
+            var carListings = await _context.CarListings.ToListAsync();
+            var carListingDtos = _mapper.Map<IEnumerable<CarListingDto>>(carListings);
+
+            return Ok(carListingDtos);
         }
 
         // PUT api/<CarListingController>/5
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin, SuperUser")]
-        public async Task<IActionResult> UpdateCarAsync(int id, CarListing carListing)
+        public async Task<IActionResult> UpdateCarAsync(int id, CarListingDto carListing)
         {
             if (id != carListing.CarId)
             {
