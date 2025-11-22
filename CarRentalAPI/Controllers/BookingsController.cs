@@ -126,5 +126,38 @@ namespace CarRentalAPI.Controllers
             return NoContent();
         }
 
+        [HttpPut ("{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateBooking(int id, BookingDto bookingDto)
+        {
+            if (id != bookingDto.BookingId)
+            {
+                return BadRequest("Booking ID mismatch.");
+            }
+
+            var existingBooking = await _bookingRepo.GetBookingByIdAsync(id);
+            if (existingBooking == null)
+            {
+                return NotFound();
+            }
+
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!User.IsInRole("Admin") && !User.IsInRole("SuperUser") && currentUserId != existingBooking.CustomerId)
+            {
+                return Forbid();
+            }
+
+            var car = await _carRepo.GetCarByIdAsync(bookingDto.CarId);
+            if (car == null)
+            {
+                ModelState.AddModelError("CarId", "The specified car was not found.");
+                return BadRequest(ModelState);
+            }
+            _mapper.Map(bookingDto, existingBooking);
+            
+            await _bookingRepo.UpdateBookingAsync(existingBooking);
+            return NoContent();
+        }
+
     }   
 }

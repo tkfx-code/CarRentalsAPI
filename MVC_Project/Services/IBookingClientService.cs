@@ -10,6 +10,7 @@ namespace MVC_Project.Services
         Task<Response<BookingViewModel>> GetBookingDetailsAsync(int id);
         Task<bool> CreateBookingAsync(BookingViewModel model);
         Task<bool> DeleteBookingAsync(int id);
+        Task<bool> UpdateBookingAsync(BookingViewModel model);
 
     }
 }

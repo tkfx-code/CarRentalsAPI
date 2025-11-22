@@ -33,6 +33,22 @@ namespace MVC_Project
             }
         }
 
+        public async Task<bool> UpdateBookingAsync(BookingViewModel model)
+        {
+            CarryAccessToken();
+            var bookingDto = _mapper.Map<BookingDto>(model);
+
+            try
+            {
+                await _client.BookingsPOSTAsync(model.BookingId, bookingDto);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to update booking.", ex);
+            }
+        }
+
         public async Task<bool> DeleteBookingAsync(int id)
         {
             CarryAccessToken();
