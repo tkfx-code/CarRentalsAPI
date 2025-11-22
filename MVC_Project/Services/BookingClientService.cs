@@ -176,5 +176,40 @@ namespace MVC_Project
                 return new Response<BookingViewModel> { Success = false, Message = "Not implemented." };
             }
         }
+
+        public async Task<Response<List<BookingViewModel>>> GetBookingsByCustomerAsync(string customerId)
+        {
+            var response = new Response<List<BookingViewModel>>();
+            CarryAccessToken();
+
+            try
+            {
+                var bookingDtos = _client.ByCustomerAsync(customerId);
+
+                if (bookingDtos != null)
+                {
+                    response.Success = true;
+                    response.Data = _mapper.Map<List<BookingViewModel>>(bookingDtos);
+                }
+                else
+                {
+                    response.Data = new List<BookingViewModel>();
+                    response.Success = true;
+                }
+            }
+            catch (ApiException ex)
+            {
+                response.Success = false;
+                response.Message = $"API-error when fetching bookings: {ex.StatusCode}";
+                response.Data = new List<BookingViewModel>();
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"An unexpected error occured: {ex.Message}";
+                response.Data = new List<BookingViewModel>();
+            }
+            return response;
+        }
     }
 }

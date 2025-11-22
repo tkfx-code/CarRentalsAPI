@@ -76,7 +76,7 @@ namespace MVC_Project.Controllers
                 return RedirectToAction("Index", "Home");
             }
             var customerVM = customer.Data;
-            var bookingsResponse = await _bookingService.GetBookingsByCustomerIdAsync(currentUserId);
+            var bookingsResponse = await _bookingService.GetBookingsByCustomerAsync(currentUserId);
             List<BookingViewModel> customerBookings = new List<BookingViewModel>();
 
             var profileVM = new ProfileViewModel

@@ -65,9 +65,12 @@ namespace CarRentalAPI.Repositories
             return await _context.Bookings.AnyAsync(b => b.BookingId == id);
         }
 
-        public Task<IEnumerable<Booking>> GetBookingsByCustomerIdAsync(string customerId)
+        public async Task<IEnumerable<Booking>> GetBookingsByCustomerIdAsync(string customerId)
         {
-            throw new NotImplementedException();
+            return await _context.Bookings
+                .Include(b => b.Car)
+                .Where(b => b.CustomerId == customerId)
+                .ToListAsync();
         }
     }
 }
