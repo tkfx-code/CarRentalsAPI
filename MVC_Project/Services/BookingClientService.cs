@@ -40,7 +40,7 @@ namespace MVC_Project
 
             try
             {
-                await _client.BookingsPOSTAsync(model.BookingId, bookingDto);
+                await _client.BookingsPUTAsync(model.BookingId, bookingDto);
                 return true;
             }
             catch (Exception ex)

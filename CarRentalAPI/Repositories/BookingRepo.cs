@@ -32,10 +32,22 @@ namespace CarRentalAPI.Repositories
             return booking;
         }
 
-        public async Task UpdateBookingAsync(Booking booking)
+        public async Task<bool> UpdateBookingAsync(Booking booking)
         {
-            _context.Bookings.Update(booking);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Bookings.Update(booking);
+                var changes = await _context.SaveChangesAsync();
+                return changes >0;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         public async Task DeleteBookingAsync(int id)

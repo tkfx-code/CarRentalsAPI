@@ -9,7 +9,6 @@ namespace CarRentalAPI.Repositories
     {
         private readonly ApplicationDbContext _context;
 
-        // Injektion av databaskontexten
         public CarListingRepo(ApplicationDbContext context)
         {
             _context = context;
@@ -35,8 +34,6 @@ namespace CarRentalAPI.Repositories
         public async Task UpdateCarAsync(CarListing car)
         {
             _context.CarListings.Update(car);
-            // Märk: Update-metoden för DbContext spårar ändringarna.
-            // För att hantera bilder/listor korrekt vid Edit behöver vi kanske en annan metod, men detta är grunden.
             await _context.SaveChangesAsync();
         }
 
@@ -50,7 +47,6 @@ namespace CarRentalAPI.Repositories
             }
         }
 
-        // Specifik affärslogik
         public async Task<IEnumerable<CarListing>> GetAvailableCarsAsync()
         {
             return await _context.CarListings
