@@ -13,6 +13,5 @@ namespace CarRentalAPI.Interfaces
 
         Task<bool> CustomerExistsAsync(string id);
 
-        //View profile task? 
     }
 }

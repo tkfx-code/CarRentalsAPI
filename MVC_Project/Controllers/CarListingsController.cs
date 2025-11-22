@@ -16,7 +16,6 @@ namespace MVC_Project.Controllers
 
         // GET: CarListings
         // Fetch List of all Car Listings
-
         public async Task<IActionResult> Index()
         {
             var cars = await _carService.GetAllCarsAsync();

@@ -159,5 +159,24 @@ namespace CarRentalAPI.Controllers
             return NoContent();
         }
 
+        // GET: api/Bookings/ByCustomer/{customerId}
+        [HttpGet("ByCustomer/{customerId}")] 
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByCustomer(string customerId)
+        {
+           
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!User.IsInRole("Admin") && !User.IsInRole("SuperUser") && currentUserId != customerId)
+            {
+                return Forbid();
+            }
+
+            var bookings = await _bookingRepo.GetBookingsByCustomerIdAsync(customerId);
+
+            var bookingDtos = _mapper.Map<IEnumerable<BookingDto>>(bookings);
+
+            return Ok(bookingDtos);
+        }
+
     }   
 }
