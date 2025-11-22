@@ -15,6 +15,6 @@ namespace CarRentalsClassLibrary.Model
         public bool isAvailable { get; set; } = true;
 
         //One to many: One car can get booked several times
-        public List<Booking> Bookings { get; set; }
+        public List<Booking>? Bookings { get; set; }
     }
 }
