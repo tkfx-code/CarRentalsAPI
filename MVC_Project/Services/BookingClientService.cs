@@ -35,8 +35,7 @@ namespace MVC_Project
 
         public async Task<bool> DeleteBookingAsync(int id)
         {
-            var token = _httpContextAccessor.HttpContext?.Session.GetString("JWToken");
-            _client.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            CarryAccessToken();
 
             try
             {
@@ -52,14 +51,7 @@ namespace MVC_Project
         public async Task<Response<List<BookingViewModel>>> GetAllBookingsAsync()
         {
             {
-                var token = _httpContextAccessor.HttpContext?.Session.GetString("JWToken");
-
-                if (string.IsNullOrEmpty(token))
-                {
-                    return null;
-                }
-
-                _client.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                CarryAccessToken();
 
                 try
                 {
@@ -110,15 +102,43 @@ namespace MVC_Project
         }
 
 
-        public Task<Response<BookingViewModel>> GetBookingDetailsAsync(int id)
+        public async Task<Response<BookingViewModel>> GetBookingDetailsAsync(int id)
         {
-            throw new NotImplementedException();
+            CarryAccessToken();
+            try
+            {
+                var bookingDto = await _client.BookingsGETAsync(id);
+
+                if (bookingDto == null)
+                {
+                    return new Response<BookingViewModel> { Success = false, Message = $"Bil ID: {id} could not be found." };
+                }
+
+                var viewModel = _mapper.Map<BookingViewModel>(bookingDto);
+
+                return new Response<BookingViewModel> { Data = viewModel, Success = true };
+            }
+            catch (ApiException ex)
+            {
+                return new Response<BookingViewModel>
+                {
+                    Success = false,
+                    Message = $"API-error when fetching car: {ex.StatusCode}"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Response<BookingViewModel>
+                {
+                    Success = false,
+                    Message = $"An unexpected error occured: {ex.Message}"
+                };
+            }
         }
 
         public async Task<Response<BookingViewModel>> GetBookingByIdAsync(int id, BookingViewModel viewModel)
         {
-            var token = _httpContextAccessor.HttpContext?.Session.GetString("JWToken");
-            _client.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            CarryAccessToken();
 
             try
             {

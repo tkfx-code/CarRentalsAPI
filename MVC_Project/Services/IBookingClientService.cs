@@ -1,9 +1,5 @@
 ﻿using MVC_Project.Models;
 using MVC_Project.Services;
-{
-    
-}
-
 
 namespace MVC_Project.Services
 {

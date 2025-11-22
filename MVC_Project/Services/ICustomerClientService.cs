@@ -4,10 +4,10 @@ namespace MVC_Project.Services
 {
     public interface ICustomerClientService
     {
-        Task<IEnumerable<CustomerViewModel>> GetAllCustomersAsync(string token);
-        Task<CustomerViewModel?> GetCustomerDetailsAsync(string id, string token);
-        Task<bool> CreateCustomerAsync(CustomerViewModel model, string token);
-        Task<bool> UpdateCustomerAsync(CustomerViewModel model, string token);
-        Task<bool> DeleteCustomerAsync(string id, string token);
+        Task<Response<List<CustomerViewModel>>> GetAllCustomersAsync();
+        Task<Response<CustomerViewModel?>> GetCustomerDetailsAsync(string id);
+        Task<bool> CreateCustomerAsync(CustomerViewModel model);
+        Task<bool> UpdateCustomerAsync(CustomerViewModel model);
+        Task<bool> DeleteCustomerAsync(string id);
     }
 }

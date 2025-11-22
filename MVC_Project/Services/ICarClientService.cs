@@ -4,10 +4,10 @@ namespace MVC_Project.Services
 {
     public interface ICarClientService
     {
-        Task<IEnumerable<CarListingViewModel>> GetAllCarsAsync(string token);
-        Task<CarListingViewModel?> GetCarDetailsAsync(int id, string token);
-        Task<bool> CreateCarAsync(CarListingViewModel model, string token);
-        Task<bool> UpdateCarAsync(CarListingViewModel model, string token);
-        Task<bool> DeleteCarAsync(int id, string token);
+        Task<Response<List<CarListingViewModel>>> GetAllCarsAsync();
+        Task<Response<CarListingViewModel?>> GetCarDetailsAsync(int id);
+        Task<bool> CreateCarAsync(CarListingViewModel model);
+        Task<bool> UpdateCarAsync(CarListingViewModel model);
+        Task<bool> DeleteCarAsync(int id);
     }
 }

@@ -42,7 +42,7 @@ namespace CarRentalAPI.Controllers
             return Ok(bookingDtos);
         }
 
-        // GET: api/Bookings/5 - Hämta en specifik bokning
+        // GET: api/Bookings/5 - Fetch specific booking
         [HttpGet("{id}")]
         [Authorize]
         public async Task<ActionResult<BookingDto>> GetBooking(int id)

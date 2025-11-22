@@ -6,7 +6,6 @@ using CarRentalsClassLibrary.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-//not started
 
 namespace CarRentalAPI.Controllers
 {
@@ -43,13 +42,15 @@ namespace CarRentalAPI.Controllers
         // PUT api/<CarListingController>/5
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin, SuperUser")]
-        public async Task<IActionResult> UpdateCarAsync(int id, CarListingDto carListing)
+        public async Task<IActionResult> UpdateCarAsync(int id, CarListingDto carListingDto)
         {
-            if (id != carListing.CarId)
+            if (id != carListingDto.CarId)
             {
                 return BadRequest();
             }    
-            _context.Entry(carListing).State = EntityState.Modified;
+            var carListing = _mapper.Map<CarRentalsClassLibrary.Model.CarListing>(carListingDto);
+
+            _context.Entry(carListingDto).State = EntityState.Modified;
 
             try
             {
@@ -71,23 +72,44 @@ namespace CarRentalAPI.Controllers
 
         // GET api/<CarListingController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<ActionResult<CarListingDto>> GetCar(int id)
         {
-            return "value";
+            var car = await _repo.GetCarByIdAsync(id);
+
+            if (car == null)
+            {
+                return NotFound();
+            }
+
+            var caDto = _mapper.Map<CarListingDto>(car);
+
+            return Ok(caDto);
         }
 
         // POST api/<CarListingController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult<CarListingDto>> Post(CarListingDto carListingDto)
         {
+            var car = _mapper.Map<CarListing>(carListingDto);
+            await _repo.AddCarAsync(car);
+            var createdCarDto = _mapper.Map<CarListingDto>(car);
+            return CreatedAtAction(nameof(GetCar), new { id = createdCarDto.CarId }, createdCarDto);
+
         }
 
         
 
         // DELETE api/<CarListingController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            var customer = await _repo.GetCarByIdAsync(id);
+            if (customer == null)
+            {
+                return NotFound();
+            }
+            await _repo.DeleteCarAsync(customer.CarId);
+            return NoContent();
         }
     }
 }
