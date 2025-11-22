@@ -14,12 +14,12 @@ namespace MVC_Project.Controllers
         private readonly ICustomerClientService _customerService;
         private readonly IBookingClientService _bookingService;
 
-        public CustomersController(ICustomerClientService customerService)
+        public CustomersController(ICustomerClientService customerService, IBookingClientService bookingService)
         {
             _customerService = customerService;
             _bookingService = bookingService;
         }
-        }
+
 
         // GET: Customers
         [Authorize(Roles = "Admin")]
@@ -105,10 +105,6 @@ namespace MVC_Project.Controllers
         {
             if (ModelState.IsValid)
             {
-                var customer = _mapper.Map<Customer>(customerViewModel);
-                _context.Add(customer);
-
-                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(customerViewModel);
@@ -117,21 +113,21 @@ namespace MVC_Project.Controllers
         // GET: Customers/Edit/5
         //AUTHORIZATION: Only admins and the own customer should be able to edit customer details
         [Authorize]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(string? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var customer = await _context.Customers.FirstOrDefaultAsync(m => m.CustomerId == id);
-            var customerViewModel = _mapper.Map<CustomerViewModel>(customer);
-
+            var customer = await _customerService.GetCustomerDetailsAsync(id);
 
             if (customer == null)
             {
                 return NotFound();
             }
+
+            var customerViewModel = customer.Data;
             return View(customerViewModel);
         }
 
@@ -141,58 +137,47 @@ namespace MVC_Project.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Edit(int id, [Bind("CustomerId,FirstName,LastName,Email,PhoneNumber")] CustomerViewModel customerViewModel)
+        public async Task<IActionResult> Edit(string id, [Bind("CustomerId,FirstName,LastName,Email,PhoneNumber")] CustomerViewModel customerViewModel)
         {
             if (id != customerViewModel.CustomerId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    var customer = await _context.Customers.FindAsync(id);
-                    _mapper.Map(customerViewModel, customer);
-                    _context.Update(customer);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CustomerViewModelExists(customerViewModel.CustomerId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return View(customerViewModel);
             }
-            return View(customerViewModel);
+            var success = await _customerService.UpdateCustomerAsync(customerViewModel);
+            if (success)
+            {
+                TempData["SuccessMessage"] = "Profile updated successfully."; // Confirmation message after editing
+                return RedirectToAction(nameof(Index));
+            } else
+            {
+                TempData["ErrorMessage"] = "An error occurred while updating the profile.";
+            }
+                return View(customerViewModel);
         }
 
         // GET: Customers/Delete/5
         // SHOW CONFIRMATION MESSAGE BEFORE DELETING
         [Authorize]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(string? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(m => m.CustomerId == id);
-            var customerViewModel = _mapper.Map<CustomerViewModel>(customer);
+            var customer = await _customerService.GetCustomerDetailsAsync(id);
 
-            if (customerViewModel == null)
+            if (customer == null)
             {
                 return NotFound();
             }
 
-            return View(customerViewModel);
+            return View(customer.Data);
         }
 
         // POST: Customers/Delete/5
@@ -201,21 +186,21 @@ namespace MVC_Project.Controllers
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var customer = await _context.Customers.FindAsync(id);
-            if (customer != null)
-            {
-                _context.Customers.Remove(customer);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Profile deleted successfully."; // Confirmation message after deletion
-            }
-            return RedirectToAction("Admin", "Home");
-        }
+            var success = await _customerService.DeleteCustomerAsync(id);
 
-        private bool CustomerViewModelExists(int id)
-        {
-            return _context.Customers.Any(e => e.CustomerId == id);
+            if (success)
+            {
+                TempData["SuccessMessage"] = "Customer deleted successfully."; // Confirmation message after deletion
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Customer not found or failed to delete.";
+                return NotFound();
+            }
+
+            return RedirectToAction("Admin", "Home");
         }
     }
 }

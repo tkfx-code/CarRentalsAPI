@@ -11,6 +11,6 @@ namespace MVC_Project.Services
         Task<bool> CreateBookingAsync(BookingViewModel model);
         Task<bool> DeleteBookingAsync(int id);
         Task<bool> UpdateBookingAsync(BookingViewModel model);
-
+        Task<Response<List<BookingViewModel>>> GetBookingsByCustomerAsync(string customerId);
     }
 }
