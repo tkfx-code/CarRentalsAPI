@@ -1,66 +1,79 @@
-//using System.Diagnostics;
-//using Microsoft.AspNetCore.Mvc;
-//using MVC_Project.Models;
-//using MVC_Project.Model;
-//using MVC_Project.Data;
-//using Microsoft.EntityFrameworkCore;
-//using Microsoft.AspNetCore.Authorization;
-//using AutoMapper;
-//using AutoMapper.QueryableExtensions;
+using System.Diagnostics;
+using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MVC_Project.Models;
+using MVC_Project.Services;
 
 
-//namespace MVC_Project.Controllers
-//{
-//    public class HomeController : Controller
-//    {
-//        private readonly ILogger<HomeController> _logger;
-//        private readonly ApplicationDbContext _context;
-//        private readonly IMapper _mapper;
+namespace MVC_Project.Controllers
+{
+    public class HomeController : Controller
+    {
+        private readonly ILogger<HomeController> _logger;
+        private readonly ICarClientService _carService;          
+        private readonly ICustomerClientService _customerService;  
+        private readonly IBookingClientService _bookingService;
 
-//        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, IMapper mapper)
-//        {
-//            _context = context;
-//            _logger = logger;
-//            _mapper = mapper;
-//        }
+        public HomeController(ILogger<HomeController> logger, ICarClientService carService, ICustomerClientService customerService, IBookingClientService bookingService)
+        {
+            _logger = logger;
+            _carService = carService;
+            _customerService = customerService;
+            _bookingService = bookingService;
+        }
 
-//        public IActionResult Index()
-//        {
-//            var carListings = _context.CarListings.ToList();
-//            return View(carListings);
-//        }
+        public async Task<IActionResult> Index()
+        {
+            var carListings = await _carService.GetAllCarsAsync();
+            return View(carListings.Data);
+        }
 
-//        [Authorize(Roles = "Admin")]
-//        public IActionResult Admin()
-//        {
-//            var customers = _context.Customers
-//                .ProjectTo<CustomerViewModel>(_mapper.ConfigurationProvider)
-//                .ToList();
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Admin()
+        {
+            var customerViewModel = await _customerService.GetAllCustomersAsync();
+            List<CustomerViewModel> customers; 
 
-//            var bookings = _context.Bookings
-//                .Include(b => b.Customer)
-//                .Include(b => b.Car)
-//                .ProjectTo<BookingViewModel>(_mapper.ConfigurationProvider)
-//                .ToList();
+            if (customerViewModel != null)
+            {
+                customers = customerViewModel.Data;
+            } else
+            {
+                customers = new List<CustomerViewModel>();
+            }
 
-//            var adminViewModel = new AdminViewModel
-//            {
-//                Customers = customers,
-//                Bookings = bookings
-//            };
-//            return View(adminViewModel);
+            var bookingViewModel = await _bookingService.GetAllBookingsAsync();
+            List<BookingViewModel> bookings;
 
-//        }
+            if (bookingViewModel != null)
+            {
+                bookings = bookingViewModel.Data;
+            }
+            else
+            {
+                bookings = new List<BookingViewModel>();
+            }
 
-//        public IActionResult Privacy()
-//        {
-//            return View();
-//        }
+            var adminViewModel = new AdminViewModel
+                {
+                    Customers = customers,
+                    Bookings = bookings
+                };
+            return View(adminViewModel);
 
-//        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-//        public IActionResult Error()
-//        {
-//            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-//        }
-//    }
-//}
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+    }
+}
