@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using MVC_Project.Data;
+using MVC_Project.Data; 
 using MVC_Project.Services;
 
 namespace MVC_Project
@@ -46,66 +44,6 @@ namespace MVC_Project
 
 
             var app = builder.Build();
-
-            //admin user and roles
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    var services = scope.ServiceProvider;
-            //    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
-            //    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-
-            //    //hardcode admin user for testing purposes
-            //    string adminRole = "Admin";
-            //    string adminEmail = "admin@example.com";
-            //    string adminPassword = "Admin@123";
-
-            //    //hardcode a "superuser"
-            //    string superUserRole = "SuperUser";
-            //    string superUserEmail = "superuser@example.com";
-            //    string superUserPassword = "SuperUser@123";
-
-            //    //check that user and role exists, create if not
-            //    if (!await roleManager.RoleExistsAsync(adminRole))
-            //    {
-            //        await roleManager.CreateAsync(new IdentityRole(adminRole));
-            //    }
-
-            //    //check that superuser role exists, create if not
-            //    if (!await roleManager.RoleExistsAsync(superUserRole))
-            //    {
-            //        await roleManager.CreateAsync(new IdentityRole(superUserRole));
-            //    }
-
-            //    var adminUser = await userManager.FindByEmailAsync(adminEmail);
-            //    if (adminUser == null)
-            //    {
-            //        adminUser = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
-            //        var result = await userManager.CreateAsync(adminUser, adminPassword);
-            //        if (result.Succeeded)
-            //        {
-            //            await userManager.AddToRoleAsync(adminUser, adminRole);
-            //        }
-            //    }
-            //    else if (!await userManager.IsInRoleAsync(adminUser, adminRole))
-            //    {
-            //        await userManager.AddToRoleAsync(adminUser, adminRole);
-            //    }
-
-            //    //Logic for SuperUser
-            //    var superUser = await userManager.FindByEmailAsync(superUserEmail);
-            //    if (superUser == null)
-            //    {
-            //        superUser = new IdentityUser { UserName = superUserEmail, Email = superUserEmail, EmailConfirmed = true };
-            //        var result = await userManager.CreateAsync(superUser, superUserPassword);
-            //        if (result.Succeeded)
-            //        {
-            //            await userManager.AddToRoleAsync(superUser, superUserRole);
-            //        }
-            //    } else if (!await userManager.IsInRoleAsync(superUser, superUserRole))
-            //    {
-            //        await userManager.AddToRoleAsync(superUser, superUserRole);
-            //    }
-            //}
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
