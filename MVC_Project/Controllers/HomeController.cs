@@ -27,6 +27,17 @@ namespace MVC_Project.Controllers
         public async Task<IActionResult> Index()
         {
             var carListings = await _carService.GetAllCarsAsync();
+            //Error testing 
+            //
+            if (!carListings.Success)
+            {
+                // Logga felet för backend-debugging
+                _logger.LogError("Could not get cars - HomeController: {ErrorMessage}", carListings.Message);
+
+                // Skicka meddelandet till vyn för att informera användaren
+                ViewData["ErrorMessage"] = "API error in HomeController.";
+            }
+
             return View(carListings.Data ?? new List<CarListingViewModel>());
         }
 

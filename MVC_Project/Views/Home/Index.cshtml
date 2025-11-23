@@ -16,6 +16,14 @@
 </div>
 
 <h1>Index</h1>
+@* Error testing *@
+@if (ViewData["ErrorMessage"] != null)
+{
+    
+    <div class="alert alert-danger" role="alert">
+        <strong>Wrong with loading car list from Index view:</strong> @ViewData["ErrorMessage"]
+    </div>
+}
 
 <p>
     @if (User.IsInRole("Admin"))

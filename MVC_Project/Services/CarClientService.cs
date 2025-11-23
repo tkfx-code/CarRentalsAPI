@@ -58,7 +58,6 @@ namespace MVC_Project.Services
                 {
                     car.Data = _mapper.Map<List<CarListingViewModel>>(carDtos);
                     car.Success = true;
-                    return new Response<List<CarListingViewModel>> { Success = true, Data = new List<CarListingViewModel>() };
                 }
                 else
                 {
