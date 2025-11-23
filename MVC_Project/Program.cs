@@ -14,7 +14,7 @@ namespace MVC_Project
             
             builder.Services.AddControllersWithViews();
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddAutoMapper(typeof(ApiMappingProfile));
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddHttpClient<IClient, Client>(client =>
             {
                 client.BaseAddress = new Uri("https://localhost:7064");

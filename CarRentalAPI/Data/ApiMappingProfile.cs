@@ -4,9 +4,9 @@ using CarRentalsClassLibrary.Model;
 
 namespace MVC_Project.Data
 {
-    public class MappingProfile:Profile
+    public class ApiMappingProfile:Profile
     {
-        public MappingProfile()
+        public ApiMappingProfile()
         {
             CreateMap<Customer, CustomerDto>().ReverseMap();
             CreateMap<CarListing, CarListingDto>().ReverseMap();
