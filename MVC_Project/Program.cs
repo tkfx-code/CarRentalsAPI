@@ -21,7 +21,10 @@ namespace MVC_Project
             builder.Services.AddScoped<IBookingClientService, BookingClientService>();
             builder.Services.AddScoped<ICarClientService, CarClientService>();
             builder.Services.AddScoped<ICustomerClientService, CustomerClientService>();
-            builder.Services.AddScoped<IAuthClientService, AuthClientService>();
+            builder.Services.AddHttpClient<IAuthClientService, AuthClientService>(client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7064");
+            });
 
             //Standard service lengths by VS
             builder.Services.AddSession(options =>

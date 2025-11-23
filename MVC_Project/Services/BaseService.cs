@@ -15,11 +15,12 @@ public class BaseService
 
     protected void CarryAccessToken()
     {
-        var token = _httpContextAccessor.HttpContext?.Session.GetString("JWToken");
+        var httpContext = _httpContextAccessor.HttpContext;
+        var token = httpContext.User.Claims.FirstOrDefault(c => c.Type == "Token")?.Value;
 
         if (string.IsNullOrEmpty(token))
         {
-            throw new NotAuthorizedException(); 
+            return; 
         }
 
         _client.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);

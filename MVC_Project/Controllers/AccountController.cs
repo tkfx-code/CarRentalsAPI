@@ -17,14 +17,14 @@ namespace MVC_Project.Controllers
 
         // GET: LoginView
         [HttpGet]
-        public IActionResult LoginView()
+        public IActionResult Login()
         {
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LoginView(LoginViewModel loginViewModel)
+        public async Task<IActionResult> Login(LoginViewModel loginViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -54,6 +54,29 @@ namespace MVC_Project.Controllers
         {
             await _authService.Logout();
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(registerViewModel);
+            }
+            var response = await _authService.RegisterAsync(registerViewModel);
+            if (response)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            ModelState.AddModelError(string.Empty, "Registration attempt failed.");
+            return View(registerViewModel);
         }
     }
 }
