@@ -3,8 +3,6 @@ using System.Security.Claims;
 using System.Text;
 using CarRentalAPI.Data;
 using CarRentalAPI.Dto;
-using CarRentalAPI.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -69,11 +67,7 @@ namespace CarRentalAPI.Controllers
                 {
                     return Unauthorized(loginUserDto);
                 }
-                //hard coded - remove
-                List<string> role = new List<string>();
-                role.Add("Admin"); //fetch user role
-                string jwttoken = await CreateToken(user, role);
-
+                string jwttoken = await CreateToken(user);
                 var response = new AuthResponseDto
                 {
                     TokenString = jwttoken,
@@ -89,7 +83,7 @@ namespace CarRentalAPI.Controllers
         }
 
         //Fix Custom Claim types and User roles
-        private async Task<string> CreateToken(APIUser user, IList<string> role)
+        private async Task<string> CreateToken(APIUser user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);

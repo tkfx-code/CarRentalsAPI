@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using CarRentalAPI.Constants;
 using CarRentalAPI.Data;
 using CarRentalAPI.Interfaces;
 using CarRentalAPI.Repositories;
@@ -20,11 +21,6 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddIdentityCore<APIUser>()
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
-
-//remove later?
-//builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
-//    .AddRoles<IdentityRole>()
-//    .AddEntityFrameworkStores<ApplicationDbContext>();
 
 //Repositories
 builder.Services.AddScoped<ICarListingRepo, CarListingRepo>();
@@ -74,19 +70,86 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
-//Middleware
-if (app.Environment.IsDevelopment())
+//seeding an admin user to test functions
+using (var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.MapOpenApi();
-    app.UseSwaggerUI();
-    app.UseMigrationsEndPoint();
+    var services = scope.ServiceProvider;
+    try
+    {
+        var userManager = services.GetRequiredService<UserManager<APIUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+        //hard coded admin
+        string adminRole = APIRoles.Admin;
+        string adminEmail = "admin@email.com";
+        string adminPassword = "Admin123!";
+
+        //hard coded user
+        string userRole = APIRoles.User;
+        string userEmail = "user@email.com";
+        string userPassword = "User123!";
+
+        //Check if role exists
+        if (!await roleManager.RoleExistsAsync(adminRole))
+        {
+            await roleManager.CreateAsync(new IdentityRole(adminRole));
+        }
+        if (!await roleManager.RoleExistsAsync(userRole))
+        {
+            await roleManager.CreateAsync(new IdentityRole(userRole));
+        }
+
+        //Create admin and user if they do not exist
+        var adminUser = await userManager.FindByEmailAsync(adminEmail);
+        if (adminUser == null)
+        {
+            var newAdminUser = new APIUser
+            {
+                UserName = adminEmail,
+                Email = adminEmail
+            };
+            var result = await userManager.CreateAsync(newAdminUser, adminPassword);
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(newAdminUser, adminRole);
+            }
+        }
+        var normalUser = await userManager.FindByEmailAsync(userEmail);
+        if (normalUser == null)
+        {
+            var newUser = new APIUser
+            {
+                UserName = userEmail,
+                Email = userEmail
+            };
+            var result = await userManager.CreateAsync(newUser, userPassword);
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(newUser, userRole);
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred seeding the DB.");
+    }
+
 }
-else
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-}
+
+    //Middleware
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.MapOpenApi();
+        app.UseSwaggerUI();
+        app.UseMigrationsEndPoint();
+    }
+    else
+    {
+        app.UseExceptionHandler("/Error");
+        app.UseHsts();
+    }
 
 app.UseHttpsRedirection();
 
