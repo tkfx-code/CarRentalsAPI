@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MVC_Project.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +32,7 @@ builder.Services.AddScoped<IBookingRepo, BookingRepo>();
 builder.Services.AddScoped<IAuthService, JwtService>();
 
 //Automapper
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddAutoMapper(typeof(ApiMappingProfile));
 
 
 builder.Services.AddControllers();

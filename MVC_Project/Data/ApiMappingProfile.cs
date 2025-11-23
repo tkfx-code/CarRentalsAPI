@@ -4,9 +4,9 @@ using MVC_Project.Services;
 
 namespace MVC_Project.Data
 {
-    public class MappingProfile:Profile
+    public class ApiMappingProfile:Profile
     {
-        public MappingProfile()
+        public ApiMappingProfile()
         {
             CreateMap<CustomerViewModel, CustomerDto>().ReverseMap();
             CreateMap<CarListingDto, CarListingViewModel>().ReverseMap();
