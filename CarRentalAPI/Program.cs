@@ -31,7 +31,7 @@ builder.Services.AddScoped<IBookingRepo, BookingRepo>();
 builder.Services.AddScoped<IAuthService, JwtService>();
 
 //Automapper
-//builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 
 builder.Services.AddControllers();
