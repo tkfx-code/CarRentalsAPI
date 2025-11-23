@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using MVC_Project.Data; 
 using MVC_Project.Services;
@@ -18,13 +20,17 @@ namespace MVC_Project
                 client.BaseAddress = new Uri("https://localhost:7064");
             });
 
+            builder.Services.AddScoped<IAuthClientService, AuthClientService>((IServiceProvider provider) =>
+                {
+                var client = provider.GetRequiredService<IClient>();
+                var httpContextAccessor = provider.GetRequiredService<IHttpContextAccessor>();
+
+                return new AuthClientService(client, httpContextAccessor);
+            });
+
             builder.Services.AddScoped<IBookingClientService, BookingClientService>();
             builder.Services.AddScoped<ICarClientService, CarClientService>();
             builder.Services.AddScoped<ICustomerClientService, CustomerClientService>();
-            builder.Services.AddHttpClient<IAuthClientService, AuthClientService>(client =>
-            {
-                client.BaseAddress = new Uri("https://localhost:7064");
-            });
 
             //Standard service lengths by VS
             builder.Services.AddSession(options =>

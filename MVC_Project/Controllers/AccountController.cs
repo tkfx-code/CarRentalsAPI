@@ -30,7 +30,14 @@ namespace MVC_Project.Controllers
             {
                 return View(loginViewModel);
             }
-            var response = await _authService.LoginAsync(loginViewModel);
+
+            var loginDto = new LoginUserDto
+            {
+                Email = loginViewModel.Email,
+                Password = loginViewModel.Password
+            };
+
+            var response = await _authService.LoginAsync(loginDto);
             string returnUrl = null;
 
             if (response)
