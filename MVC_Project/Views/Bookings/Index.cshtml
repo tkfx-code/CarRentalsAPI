@@ -1,8 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
-@using CarRentalsClassLibrary.Model
 
-@model IEnumerable<CarRentalsClassLibrary.Model.Booking>
+@model IEnumerable<MVC_Project.Models.BookingViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -43,10 +42,10 @@
                     @Html.DisplayFor(modelItem => item.BookingId)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Customer)
+                    @(item.Customer != null ? $"{item.Customer.FirstName}{item.Customer.LastName}" : "Unknown")
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Car)
+                    @(item.Car != null ? $"{item.Car.Make}{item.Car.Model}" : "Unknown")
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.StartDate)

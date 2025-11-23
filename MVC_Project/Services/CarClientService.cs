@@ -47,39 +47,38 @@ namespace MVC_Project.Services
 
         public async Task<Response<List<CarListingViewModel>>> GetAllCarsAsync()
         {
-            CarryAccessToken();
+
+            var car = new Response<List<CarListingViewModel>>();
+
             try
             {
-                var data = await _client.CarListingsAllAsync();
+                var carDtos = await _client.CarListingsAllAsync();
 
-                if (data == null)
+                if (carDtos != null)
                 {
+                    car.Data = _mapper.Map<List<CarListingViewModel>>(carDtos);
+                    car.Success = true;
                     return new Response<List<CarListingViewModel>> { Success = true, Data = new List<CarListingViewModel>() };
                 }
-
-                //mapping viewmodel
-                var carListingViewModels = data.Select(car => new CarListingViewModel
+                else
                 {
-                    CarId = car.CarId,
-                    Make = car.Make,
-                    Model = car.Model,
-                    isAvailable = car.IsAvailable
-                }).ToList();
-
-                return new Response<List<CarListingViewModel>>
-                {
-                    Data = carListingViewModels,
-                    Success = true
-                };
+                    car.Data = new List<CarListingViewModel>();
+                    car.Success = true;
+                }
+            }
+            catch (ApiException ex)
+            {
+                car.Success = false;
+                car.Message = $"An error occured. Status: {ex.StatusCode}";
+                car.Data = new List<CarListingViewModel>();
             }
             catch (Exception ex)
             {
-                return new Response<List<CarListingViewModel>>
-                {
-                    Message = ex.Message,
-                    Success = false
-                };
+                car.Success = false;
+                car.Message = $"An error occured when fetching listing";
+                car.Data = new List<CarListingViewModel>();
             }
+            return car; 
         }
 
         public async Task<Response<CarListingViewModel?>> GetCarDetailsAsync(int id)

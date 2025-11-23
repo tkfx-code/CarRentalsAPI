@@ -22,6 +22,7 @@ namespace MVC_Project
 
             builder.Services.AddScoped<IBookingClientService, BookingClientService>();
             builder.Services.AddScoped<ICarClientService, CarClientService>();
+            builder.Services.AddScoped<ICustomerClientService, CustomerClientService>();
 
             //Standard service lengths by VS
             builder.Services.AddSession(options =>
@@ -129,7 +130,7 @@ namespace MVC_Project
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
-            app.MapRazorPages();
+            //app.MapRazorPages();
 
             app.Run();
         }

@@ -27,7 +27,7 @@ namespace MVC_Project.Controllers
         public async Task<IActionResult> Index()
         {
             var carListings = await _carService.GetAllCarsAsync();
-            return View(carListings.Data);
+            return View(carListings.Data ?? new List<CarListingViewModel>());
         }
 
         [Authorize(Roles = "Admin")]

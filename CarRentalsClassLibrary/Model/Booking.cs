@@ -1,6 +1,4 @@
-﻿
-
-namespace CarRentalsClassLibrary.Model
+﻿namespace CarRentalsClassLibrary.Model
 {
     public class Booking
     {
