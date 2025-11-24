@@ -40,15 +40,14 @@ namespace MVC_Project
                 options.Cookie.IsEssential = true;
             });
 
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            })
-                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+            //Cookie Authentication
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
                 {
                     options.LoginPath = "/Account/Login";
-                    options.LogoutPath = "/Account/Logout";
-                    options.AccessDeniedPath = "/Account/AccessDenied";
+                    options.LogoutPath = "/Home/Index";
+                    options.AccessDeniedPath = "/Home/AccessDenied";
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
                 });
 
 

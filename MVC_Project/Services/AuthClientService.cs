@@ -36,47 +36,41 @@ namespace MVC_Project.Services
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(response.TokenString) as JwtSecurityToken;
 
-            var claims = jwtToken.Claims
-                .Where(c => c.Type == ClaimTypes.Role || c.Type == "role")
-                .Select(c => c.Value)
-                .ToList();
+            //jwt saved in session for API
+            _httpContextAccessor.HttpContext.Session.SetString("JWTtoken", response.TokenString);
 
-            _httpContextAccessor.HttpContext.Session.SetString("JWToken", response.TokenString);
+            //create ClaimsIdentity for local cookie auth
+            var claims = new List<Claim>();
 
-            if (claims != null && claims.Any())
-            {
-                _httpContextAccessor.HttpContext.Session.SetString("UserRoles", System.Text.Json.JsonSerializer.Serialize(claims));
-            }
+            //fetch UserID and email from JWT
+            var idClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            var emailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            if (idClaim != null) claims.Add(idClaim);
+            if (emailClaim != null) claims.Add(emailClaim);
+
+            //add to role claims
+            var roleClaims = jwtToken.Claims.Where(c => c.Type == ClaimTypes.Role || c.Type == "role");
+            claims.AddRange(roleClaims);
+
+            //add token as specialclaim for BaseService
+            claims.Add(new Claim("Token", response.TokenString));
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            //create local auth cookie
+            await _httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity));
 
             return true;
         }
 
-            //{
-            //    new Claim(ClaimTypes.NameIdentifier, response.UserId),
-            //    new Claim(ClaimTypes.Email, response.Email),
-            //    new Claim("Token", response.TokenString)
-            //};
-
-
-            //    var roleClaims = jwtToken.Claims.Where(c => c.Type == ClaimTypes.Role);
-            //    claims.AddRange(roleClaims);
-
-            //    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            //    await _httpContextAccessor.HttpContext.SignInAsync(
-            //        CookieAuthenticationDefaults.AuthenticationScheme,
-            //        new ClaimsPrincipal(claimsIdentity)
-            //    );
-            //    return true;
-            //}
-
         public async Task Logout()
         {
-            _httpContextAccessor.HttpContext.Session.Remove("JWToken");
-            _httpContextAccessor.HttpContext.Session.Remove("UserRoles");
+            _httpContextAccessor.HttpContext.Session.Remove("JWTtoken");
             await Task.CompletedTask;
             //remove authentication cookie
-            //await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
 
         public async Task<bool> RegisterAsync(RegisterViewModel model)
@@ -86,20 +80,25 @@ namespace MVC_Project.Services
             {
                 Email = model.Email,
                 Password = model.Password,
-                UserName = model.ConfirmPassword
+                UserName = model.Email
             };
 
             try
             {
                 await _client.RegisterAsync(apiRegisterDto);
-                return true;
+
+                //log in after register
+                var loginDto = new LoginUserDto { Email = model.Email, Password = model.Password };
+                return await LoginAsync(loginDto);
             }
             catch (ApiException ex)
             {
+                Console.WriteLine($"API exception> {ex.StatusCode} - {ex.Response}");
                 return false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"Exception registration: {ex.Message}");
                 return false;
             }
         }

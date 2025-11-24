@@ -4,7 +4,7 @@ namespace CarRentalAPI.Dto
 {
     public class CustomerDto
     {
-        public string CustomerId { get; set; } = "";
+        public string Id { get; set; } = "";
         [Required]
         public string FirstName { get; set; } = "";
         [Required] 

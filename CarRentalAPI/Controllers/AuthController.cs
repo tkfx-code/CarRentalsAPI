@@ -3,6 +3,8 @@ using System.Security.Claims;
 using System.Text;
 using CarRentalAPI.Data;
 using CarRentalAPI.Dto;
+using CarRentalAPI.Interfaces;
+using CarRentalsClassLibrary.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -15,11 +17,13 @@ namespace CarRentalAPI.Controllers
     {
         private readonly UserManager<APIUser> _userManager;
         private readonly IConfiguration configuration;
+        private readonly ICustomerRepo customerRepo;
 
-        public AuthController(UserManager<APIUser> userManager, IConfiguration configuration)
+        public AuthController(UserManager<APIUser> userManager, IConfiguration configuration, ICustomerRepo customerRepo)
         {
             _userManager = userManager;
             this.configuration = configuration;
+            this.customerRepo = customerRepo;
         }
 
         [HttpPost]
@@ -44,8 +48,32 @@ namespace CarRentalAPI.Controllers
                     }
                     return BadRequest(ModelState);
                 }
+
+                //add to role and create Customer entry
                 await _userManager.AddToRoleAsync(user, "User");
-                return Ok();
+
+                var customer = new Customer
+                {
+                    Id = user.Id,
+                    FirstName = userDto.FirstName,
+                    LastName = userDto.LastName,
+                    Email = userDto.Email,
+                    PhoneNumber = userDto.PhoneNumber
+                };
+
+                //save customer to db
+                await customerRepo.AddCustomerAsync(customer);
+
+                //return Jwt token
+                string jwttoken = await CreateToken(user);
+                var response = new AuthResponseDto
+                {
+                    TokenString = jwttoken,
+                    UserId = user.Id,
+                    Email = userDto.Email
+                };
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -53,7 +81,6 @@ namespace CarRentalAPI.Controllers
             }
         }
 
-        //role in parameter is probably wrong same with next method, fix
         [HttpPost]
         [Route("login")]
         public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginUserDto loginUserDto)
@@ -67,6 +94,7 @@ namespace CarRentalAPI.Controllers
                 {
                     return Unauthorized(loginUserDto);
                 }
+
                 string jwttoken = await CreateToken(user);
                 var response = new AuthResponseDto
                 {
@@ -85,11 +113,11 @@ namespace CarRentalAPI.Controllers
         //Fix Custom Claim types and User roles
         private async Task<string> CreateToken(APIUser user)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var roles = await _userManager.GetRolesAsync(user);
-            var roleClaims = roles.Select(roles => new Claim(ClaimTypes.Role, roles)).ToList();
+            var roleClaims = roles.Select(role => new Claim(ClaimTypes.Role, role)).ToList();
             var userClaims = await _userManager.GetClaimsAsync(user);
 
             var claims = new List<Claim>
@@ -97,7 +125,7 @@ namespace CarRentalAPI.Controllers
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-                //new Claim(CustomClaimTypes.Uid, user.Id)
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
             }
             .Union(roleClaims)
             .Union(userClaims);
