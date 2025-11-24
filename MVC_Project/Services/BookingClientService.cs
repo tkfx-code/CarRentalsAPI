@@ -29,17 +29,7 @@ namespace MVC_Project
 
             try
             {
-                var bookingDto = _mapper.Map<BookingDto>(model);
-
-                bookingDto.Car = new CarListingDto
-                {
-                    CarId = model.CarId
-                };
-
-                bookingDto.Customer = new CustomerDto
-                {
-                    CustomerId = model.CustomerId
-                };
+                var bookingDto = _mapper.Map<CreateBookingDto>(model);
 
                 await _client.BookingsPOSTAsync(bookingDto);
                 return true;

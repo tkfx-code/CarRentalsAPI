@@ -11,6 +11,7 @@ namespace MVC_Project.Data
             CreateMap<Customer, CustomerDto>().ReverseMap();
             CreateMap<CarListing, CarListingDto>().ReverseMap();
             CreateMap<Booking, BookingDto>().ForMember(model => model.Car, options => options.MapFrom(booking => booking.Car)).ReverseMap();
+            CreateMap<Booking, CreateBookingDto>().ReverseMap();
         }
     }
 }

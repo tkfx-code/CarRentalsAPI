@@ -1,14 +1,11 @@
 ﻿namespace CarRentalAPI.Dto
 {
-    public class BookingDto
+    public class CreateBookingDto
     {
         public int BookingId { get; set; }
         public string CustomerId { get; set; } = "";
         public int CarId { get; set; }
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
-
-        public CustomerDto Customer { get; set; } = null!;
-        public CarListingDto Car { get; set; } = null!;
     }
 }

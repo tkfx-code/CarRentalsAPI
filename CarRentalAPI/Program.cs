@@ -6,6 +6,7 @@ using CarRentalAPI.Data;
 using CarRentalAPI.Interfaces;
 using CarRentalAPI.Repositories;
 using CarRentalAPI.Services;
+using CarRentalsClassLibrary.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
@@ -84,6 +85,7 @@ using (var scope = app.Services.CreateScope())
     {
         var userManager = services.GetRequiredService<UserManager<APIUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        var customerRepo = services.GetRequiredService<ICustomerRepo>();
 
         //hard coded admin
         string adminRole = APIRoles.Admin;
@@ -133,6 +135,18 @@ using (var scope = app.Services.CreateScope())
             {
                 await userManager.AddToRoleAsync(newUser, userRole);
             }
+        }
+        var customer = await customerRepo.GetCustomerByIdAsync(userEmail);     //("bdedbc96-fb30-49dc-8873-66bf8828c5f0");
+        if (customer == null)
+        {
+            await customerRepo.AddCustomerAsync(new Customer
+            {
+                CustomerId = userEmail, //"bdedbc96-fb30-49dc-8873-66bf8828c5f0",
+                FirstName = "Default",
+                LastName = "User",
+                Email = userEmail,
+                PhoneNumber = "123-456-7890",
+            });
         }
     }
     catch (Exception ex)

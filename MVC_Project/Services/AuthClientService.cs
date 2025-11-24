@@ -80,7 +80,6 @@ namespace MVC_Project.Services
             {
                 Email = model.Email,
                 Password = model.Password,
-                UserName = model.Email
             };
 
             try
