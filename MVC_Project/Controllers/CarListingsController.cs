@@ -5,11 +5,11 @@ using MVC_Project.Services;
 
 namespace MVC_Project.Controllers
 {
-    public class CarListingController : Controller
+    public class CarListingsController : Controller
     {
         private readonly ICarClientService _carService;
 
-        public CarListingController(ICarClientService carService)
+        public CarListingsController(ICarClientService carService)
         {
             _carService = carService;
         }

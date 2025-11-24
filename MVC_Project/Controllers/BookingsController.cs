@@ -13,11 +13,13 @@ namespace MVC_Project.Controllers
     {
         private readonly IBookingClientService _bookingService;
         private readonly ICarClientService _carService;
+        private readonly ICustomerClientService _customerService;
 
-        public BookingsController(IBookingClientService bookingService, ICarClientService carService)
+        public BookingsController(IBookingClientService bookingService, ICarClientService carService, ICustomerClientService customerService)
         {
             _bookingService = bookingService;
             _carService = carService;
+            _customerService = customerService;
         }
 
         // GET: Bookings
@@ -33,7 +35,7 @@ namespace MVC_Project.Controllers
                 return View(new List<BookingViewModel>());
             }
 
-            return View(bookings);
+            return View(bookings.Data ?? new List<BookingViewModel>());
         }
 
         // GET: Bookings/Details/5
@@ -43,17 +45,66 @@ namespace MVC_Project.Controllers
         {
             var booking = await _bookingService.GetBookingDetailsAsync(id);
 
-            if (booking == null)
+            
+            if (booking == null || !booking.Success || booking.Data == null)
             {
                 return NotFound();
             }
 
             var bookingViewModel = booking.Data;
+
             var carDetails = await _carService.GetCarDetailsAsync(bookingViewModel.CarId);
-            if (carDetails != null)
+            if (carDetails != null && carDetails.Success)
             {
                 bookingViewModel.Car = carDetails.Data;
             }
+
+            return View(bookingViewModel);
+        }
+
+        // GET: Bookings/Create?carId=X
+        // FIX: Metoden tar nu emot carId från URL och konstruerar ViewModel
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Create(int? carId)
+        {
+            if (carId == null)
+            {
+                TempData["ErrorMessage"] = "Ingen bil valdes för bokning.";
+                return RedirectToAction("Index", "Home");
+            }
+            //fetch car details
+            var carResult = await _carService.GetCarDetailsAsync(carId.Value);
+            if (carResult == null || !carResult.Success || carResult.Data == null)
+            {
+                TempData["ErrorMessage"] = "Den valda bilen hittades inte eller är otillgänglig.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            //fetch customer details
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            CustomerViewModel currentCustomer = new CustomerViewModel();
+            int? customerDbId = null; 
+
+            if (!string.IsNullOrEmpty(userIdClaim))
+            {
+                var customerResponse = await _customerService.GetCustomerDetailsAsync(userIdClaim);
+
+                if (customerResponse != null && customerResponse.Success && customerResponse.Data != null)
+                {
+                    currentCustomer = customerResponse.Data;
+                    customerDbId = currentCustomer.CustomerId;
+                }
+            }
+
+            // 3. Skapa ViewModel för vyn
+            var bookingViewModel = new BookingViewModel
+            {
+                CarId = carId.Value,
+                Car = carResult.Data,
+                CustomerId = customerDbId.GetValueOrDefault(0),
+                Customer = currentCustomer
+            };
 
             return View(bookingViewModel);
         }
@@ -68,11 +119,11 @@ namespace MVC_Project.Controllers
             {
                 return View(bookingViewModel);
             }
-            
+
             var result = await _bookingService.CreateBookingAsync(bookingViewModel);
             if (result)
             {
-                TempData["SuccessMessage"] = "Booking created successfully."; // Confirmation message after booking
+                TempData["SuccessMessage"] = "Booking created successfully."; 
                 return RedirectToAction("Index", "Home");
             }
             else
