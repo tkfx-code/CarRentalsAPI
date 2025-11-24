@@ -38,15 +38,15 @@ namespace CarRentalAPI.Services
 
             //Fetch secret key
             var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+                Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]!));
 
             //Create credentials
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             //Create token
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: _configuration["JwtSettings:Issuer"],
+                audience: _configuration["JwtSettings:Audience"],
                 claims: claims,
                 expires: DateTime.Now.AddDays(7),
                 signingCredentials: credentials);

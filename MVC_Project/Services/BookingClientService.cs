@@ -10,10 +10,15 @@ namespace MVC_Project
     public class BookingClientService : BaseService, IBookingClientService
     {
         private readonly IMapper _mapper;
+        private readonly IClient _client;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public BookingClientService(IHttpContextAccessor httpContextAccessor, IClient client, IMapper mapper) : base (httpContextAccessor, client)
         {
             _mapper = mapper;
+            _client = client;
+            _httpContextAccessor = httpContextAccessor;
+
         }
 
 
@@ -24,12 +29,42 @@ namespace MVC_Project
 
             try
             {
-                await _client.BookingsPOSTAsync(_mapper.Map<BookingDto>(model));
+                var bookingDto = _mapper.Map<BookingDto>(model);
+
+                bookingDto.Car = new CarListingDto
+                {
+                    CarId = model.CarId
+                };
+
+                bookingDto.Customer = new CustomerDto
+                {
+                    CustomerId = model.CustomerId
+                };
+
+                await _client.BookingsPOSTAsync(bookingDto);
                 return true;
+            }
+
+            //added error handling to see more precise what is going wrong
+            catch (ApiException ex)
+            {
+                Console.WriteLine($"API Error encountered (Status: {ex.StatusCode}):");
+                Console.WriteLine($"Message: {ex.Message}");
+                Console.WriteLine($"Response Content: {ex.Response}"); 
+
+                throw new Exception($"API call failed: Status {ex.StatusCode}. Response: {ex.Response}", ex);
             }
             catch (Exception ex)
             {
-                throw new Exception("Failed to create booking.", ex);
+                Console.WriteLine($"General exception occurred during API call:");
+                Console.WriteLine($"Error Type: {ex.GetType().Name}");
+                Console.WriteLine($"Error Message: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.GetType().Name} - {ex.InnerException.Message}");
+                }
+
+                throw new Exception("Failed to create booking. See console logs for details.", ex);
             }
         }
 
@@ -127,7 +162,7 @@ namespace MVC_Project
 
                 if (bookingDto == null)
                 {
-                    return new Response<BookingViewModel> { Success = false, Message = $"Bil ID: {id} could not be found." };
+                    return new Response<BookingViewModel> { Success = false, Message = $"Car ID: {id} could not be found." };
                 }
 
                 var viewModel = _mapper.Map<BookingViewModel>(bookingDto);

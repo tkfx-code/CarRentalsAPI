@@ -71,7 +71,7 @@ namespace CarRentalAPI.Controllers
 
         // POST: api/Bookings - Create new booking
         [HttpPost]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User, Admin")]
         public async Task<ActionResult<BookingDto>> PostBooking(BookingDto createBookingDto)
         {
             // Validate car 

@@ -1,4 +1,6 @@
-﻿namespace CarRentalAPI.Dto
+﻿using System.Text.Json.Serialization;
+
+namespace CarRentalAPI.Dto
 {
     public class BookingDto
     {
@@ -8,7 +10,9 @@
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
 
-        public CustomerDto Customer { get; set; }
-        public CarListingDto Car { get; set; }
+        [JsonIgnore]
+        public CustomerDto Customer { get; set; } = null!;
+        [JsonIgnore]
+        public CarListingDto Car { get; set; } = null!;
     }
 }

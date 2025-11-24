@@ -49,7 +49,7 @@ namespace CarRentalAPI.Repositories
         }
         public async Task<bool> CustomerExistsAsync(string id)
         {
-            return await _context.Customers.AnyAsync(c => c.Id == id);
+            return await _context.Customers.AnyAsync(c => c.CustomerId == id);
         }
     }
 }

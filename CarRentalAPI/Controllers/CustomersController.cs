@@ -52,12 +52,12 @@ namespace CarRentalAPI.Controllers
 
 
             // Auktoriseringskontroll: Endast Admin/SuperUser ELLER kunden som äger bokningen får se detaljer.
-            if (!User.IsInRole("Admin") && !User.IsInRole("SuperUser") && currentUserId != customer.Id)
+            if (!User.IsInRole("Admin") && !User.IsInRole("SuperUser") && currentUserId != customer.CustomerId)
             {
                 return Forbid();
             }
 
-            if (id != customer.Id)
+            if (id != customer.CustomerId)
             {
                 return BadRequest();
             }
@@ -103,7 +103,7 @@ namespace CarRentalAPI.Controllers
             var customer = _mapper.Map<Customer>(customerDto);
             await _repo.AddCustomerAsync(customer);
             var createdCustomerDto = _mapper.Map<CustomerDto>(customer);
-            return CreatedAtAction(nameof(GetCustomerByIdAsync), new { id = createdCustomerDto.Id }, createdCustomerDto);
+            return CreatedAtAction(nameof(GetCustomerByIdAsync), new { id = createdCustomerDto.CustomerId }, createdCustomerDto);
         }
 
         [HttpDelete("{id}")]
@@ -114,7 +114,7 @@ namespace CarRentalAPI.Controllers
             {
                 return NotFound();
             }
-            await _repo.DeleteCustomerAsync(customer.Id);
+            await _repo.DeleteCustomerAsync(customer.CustomerId);
             return NoContent();
         }
 

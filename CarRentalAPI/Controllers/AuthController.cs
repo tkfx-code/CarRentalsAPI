@@ -54,7 +54,7 @@ namespace CarRentalAPI.Controllers
 
                 var customer = new Customer
                 {
-                    Id = user.Id,
+                    CustomerId = user.Id,
                     FirstName = userDto.FirstName,
                     LastName = userDto.LastName,
                     Email = userDto.Email,

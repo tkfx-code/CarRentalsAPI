@@ -70,30 +70,32 @@ namespace MVC_Project.Controllers
         {
             if (carId == null)
             {
-                TempData["ErrorMessage"] = "Ingen bil valdes för bokning.";
+                TempData["ErrorMessage"] = "No car found.";
                 return RedirectToAction("Index", "Home");
             }
             //fetch car details
             var carResult = await _carService.GetCarDetailsAsync(carId.Value);
             if (carResult == null || !carResult.Success || carResult.Data == null)
             {
-                TempData["ErrorMessage"] = "Den valda bilen hittades inte eller är otillgänglig.";
+                TempData["ErrorMessage"] = "Car not found or not available.";
                 return RedirectToAction("Index", "Home");
             }
 
             //fetch customer details
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             CustomerViewModel currentCustomer = new CustomerViewModel();
-            int? customerDbId = null; 
+
+            string customerIdentityId = string.Empty;
 
             if (!string.IsNullOrEmpty(userIdClaim))
             {
+                customerIdentityId = userIdClaim;
+
                 var customerResponse = await _customerService.GetCustomerDetailsAsync(userIdClaim);
 
                 if (customerResponse != null && customerResponse.Success && customerResponse.Data != null)
                 {
                     currentCustomer = customerResponse.Data;
-                    customerDbId = currentCustomer.CustomerId;
                 }
             }
 
@@ -102,7 +104,7 @@ namespace MVC_Project.Controllers
             {
                 CarId = carId.Value,
                 Car = carResult.Data,
-                CustomerId = customerDbId.GetValueOrDefault(0),
+                CustomerId = customerIdentityId,
                 Customer = currentCustomer
             };
 

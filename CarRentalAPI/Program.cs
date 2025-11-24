@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using CarRentalAPI.Constants;
 using CarRentalAPI.Data;
 using CarRentalAPI.Interfaces;
@@ -50,11 +52,10 @@ builder.Services.AddCors(options =>
 });
 
 //JWT Authentication
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
+//Clear jwt before auth to not change names of ClaimTypes.Rome
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -62,6 +63,10 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
+
+        //explicit tell to use full ClaimTypes.Role URI
+        RoleClaimType = ClaimTypes.Role,
+
         //Values from appsettings.json
         ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
         ValidAudience = builder.Configuration["JwtSettings:Audience"],

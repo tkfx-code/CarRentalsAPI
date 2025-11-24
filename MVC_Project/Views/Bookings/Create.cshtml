@@ -10,16 +10,20 @@
 
     <h4>Booking Details</h4>
     <hr />
-    <form asp-action="Create" onsubmit="return confirm('Your booking was successful!');">
+    <form asp-action="Create" id="bookingForm">
     <div class="row">
         <div class="col-md-4">
             <dl class="row">
                     <dt> Customer Info </dt>
-                    <dd>@Html.DisplayFor(model => model.Customer.FirstName) @Html.DisplayFor(model => model.Customer.LastName)</dd>
+                    <dd>@Html.DisplayFor(model => model.Customer.FirstName)</dd>
+                    <dd>@Html.DisplayFor(model => model.Customer.LastName)</dd>
 					<dd>@Html.DisplayFor(model => model.Customer.Email)</dd>
 
                     <dt> Car Info </dt>
-                    <dd>@Html.DisplayNameFor(model => model.Car.Make) @Html.DisplayNameFor(model => model.Car.Model)</dd>
+                    <dd>@Html.DisplayNameFor(model => model.Car.Make)</dd>
+                    <dd>@Html.DisplayNameFor(model => model.Car.Model)</dd>
+                    <dd>@Html.DisplayFor(model => model.Car.Make) </dd>
+                    <dd>@Html.DisplayFor(model =>model.Car.Model)</dd>
                 </dl>
 
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -36,6 +40,7 @@
                 </div>
 
                 <input type="hidden" asp-for="CarId" />
+                <input type="hidden" asp-for="CustomerId"/>
                 <div class="form-group mt-2">
                     <input type="submit" value="Confirm Booking" class="btn btn-primary" />
                 </div>

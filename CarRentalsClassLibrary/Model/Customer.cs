@@ -4,7 +4,8 @@ namespace CarRentalsClassLibrary.Model
 {
     public class Customer
     {
-        public string Id { get; set; }
+        [Key]
+        public string CustomerId { get; set; }
         [Required(ErrorMessage = "First Name is required")]
         public string FirstName { get; set; } = "";
         [Required(ErrorMessage = "Last Name is required")]
