@@ -80,7 +80,7 @@ namespace MVC_Project.Controllers
             var response = await _authService.RegisterAsync(registerViewModel);
             if (response)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Index", "Home");
             }
             ModelState.AddModelError(string.Empty, "Registration attempt failed.");
             return View(registerViewModel);
